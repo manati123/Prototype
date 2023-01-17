@@ -20,7 +20,11 @@ struct SignUpView: View {
             CredentialsView(email: $email, password: $password)
             Spacer()
             Button {
-                onFinish()
+                if email.count > 8 && password.count > 8 {
+                    onFinish()
+                } else {
+                    ErrorHandler.errorHandler.showError(message: "Password/email too short")
+                }
             } label: {
                 Text("Sign Up")
                     .font(.headline)

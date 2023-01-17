@@ -17,12 +17,14 @@ struct CredentialsView: View {
                 .background(Color.white)
                 .cornerRadius(5.0)
                 .shadow(radius: 5.0)
+                .autocapitalization(.none)
             
             SecureField("Password", text: $password)
                 .padding()
                 .background(Color.white)
                 .cornerRadius(5.0)
                 .shadow(radius: 5.0)
+                .autocapitalization(.none)
         }.padding(.horizontal, 20)
     }
 }

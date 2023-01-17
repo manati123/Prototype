@@ -9,11 +9,20 @@ import Foundation
 import SwiftUI
 
 struct MainScreenView: View {
+    let onFinish: () -> Void
+    let isRecruiter: Bool = UserDefaults.standard.bool(forKey: "isRecruiter")
     @State var students: [Student] = [
-        Student(id: 0, name: "John Doe", education: "Evozon", location: "Cluj", age: 23, imageName: "image"),
+        Student(id: 0, name: "John Doe", education: "UBB", location: "Cluj", age: 23, imageName: "image"),
         Student(id: 1, name: "John Doe", education: "UBB", location: "Cluj", age: 27, imageName: "image"),
         Student(id: 2, name: "John Doe", education: "UBB", location: "Cluj", age: 27, imageName: "image"),
         Student(id: 3, name: "John Doe", education: "UBB", location: "Cluj", age: 27, imageName: "image"),
+    ]
+    
+    @State var companies: [Company] = [
+        Company(id: 0, name: "Tapptitude", description: "A mobile product company with attitude", imageName: "image"),
+        Company(id: 1, name: "Tapptitude", description: "A mobile product company with attitude", imageName: "image"),
+        Company(id: 2, name: "Tapptitude", description: "A mobile product company with attitude", imageName: "image"),
+        Company(id: 3, name: "Tapptitude", description: "A mobile product company with attitude", imageName: "image"),
     ]
     
     /// Return the CardViews width for the given offset in the array
@@ -49,25 +58,66 @@ struct MainScreenView: View {
                 VStack(spacing: 24) {
                     DateView()
                     ZStack {
-                        ForEach(self.students, id: \.self) { user in
-                            Group {
-                                // Range Operator
-                                if (self.maxID - 3)...self.maxID ~= user.id {
-                                    CardView(student: user, onRemove: { removedUser in
-                                        // Remove that user from our array
-                                        self.students.removeAll { $0.id == removedUser.id }
-                                    })
-                                        .animation(.spring())
-                                        .frame(width: self.getCardWidth(geometry, id: user.id), height: 400)
-                                        .offset(x: 0, y: self.getCardOffset(geometry, id: user.id))
-                                }
-                            }
+                        if isRecruiter == false {
+                            companyCards(geometry: geometry)
+                        } else {
+                            studentCards(geometry: geometry)
                         }
                     }
                     Spacer()
+                    Button {
+                        UserDefaults.standard.removeObject(forKey: "isRecruiter")
+                        onFinish()
+                        
+                    } label: {
+                        Text("Log Out")
+                    }
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(width: 220, height: 60)
+                    .background(Color.green)
+                    .cornerRadius(15.0)
+                    .shadow(radius: 5.0)
                 }
             }
         }.padding()
+    }
+    
+    @ViewBuilder
+    func companyCards(geometry: GeometryProxy) -> some View {
+        ForEach(self.companies, id: \.self) { company in
+            Group {
+                // Range Operator
+                if (self.maxID - 3)...self.maxID ~= company.id {
+                    CompanyCardView(company: company, onRemove: { removedCompany in
+                        // Remove that user from our array
+                        self.companies.removeAll { $0.id == removedCompany.id }
+                    })
+                    .animation(.spring())
+                    .frame(width: self.getCardWidth(geometry, id: company.id), height: 400)
+                    .offset(x: 0, y: self.getCardOffset(geometry, id: company.id))
+                }
+            }
+        }//
+    }
+    
+    @ViewBuilder
+    func studentCards(geometry: GeometryProxy) -> some View {
+        ForEach(self.students, id: \.self) { user in
+            Group {
+                // Range Operator
+                if (self.maxID - 3)...self.maxID ~= user.id {
+                    CardView(student: user, onRemove: { removedUser in
+                        // Remove that user from our array
+                        self.students.removeAll { $0.id == removedUser.id }
+                    })
+                    .animation(.spring())
+                    .frame(width: self.getCardWidth(geometry, id: user.id), height: 400)
+                    .offset(x: 0, y: self.getCardOffset(geometry, id: user.id))
+                }
+            }
+        }//
     }
 }
 
@@ -76,7 +126,7 @@ struct DateView: View {
         VStack {
             HStack {
                 VStack(alignment: .leading) {
-                    Text("Friday, 10th January")
+                    Text(Date.now.addingTimeInterval(600), style: .date)
                         .font(.title)
                         .bold()
                     Text("Today")

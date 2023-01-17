@@ -19,21 +19,22 @@ struct LoginUser {
 class LoginViewModel: ObservableObject {
     @Published var user: LoginUser = .init(email: "", password: "")
     
-    func checkCredentials(onFinishStudent: () -> Void, onFinishRecruiter: () -> Void) {
-        if user.email == "student@test.dev" {
-            onFinishStudent()
+    func checkCredentials(onFinish: () -> Void) {
+        if user.email == "student@test.dev" && user.email.count > 8 {
             UserDefaults.standard.set(false, forKey: "isRecruiter")
-        } else if user.email == "recruiter@test.dev" {
-            onFinishRecruiter()
+            onFinish()
+        } else if user.email == "recruiter@test.dev" && user.email.count > 8{
             UserDefaults.standard.set(true, forKey: "isRecruiter")
+            onFinish()
+        } else {
+            ErrorHandler.errorHandler.showError(message: "Wrong credentials")
         }
     }
 }
 struct LoginView: View {
     @StateObject var viewModel: LoginViewModel = .init()
     
-    let onFinishStudent: () -> Void
-    let onFinishRecruiter: () -> Void
+    let onFinish: () -> Void
     
     var body: some View {
         VStack {
@@ -44,7 +45,7 @@ struct LoginView: View {
             CredentialsView(email: $viewModel.user.email, password: $viewModel.user.password)
             Spacer()
             Button {
-                viewModel.checkCredentials(onFinishStudent: onFinishStudent, onFinishRecruiter: onFinishRecruiter)
+                viewModel.checkCredentials(onFinish: onFinish)
             } label: {
                 Text("Login")
                     .font(.headline)
